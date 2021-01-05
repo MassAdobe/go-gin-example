@@ -1,6 +1,8 @@
 # go-gin-example
 接入服务示例
 
+---
+
 ### 创建服务方式：
 #### 配置文件：
 ```yaml
@@ -26,8 +28,9 @@ LogPath: ''
 LogLevel: ''
 ```
 
-#### main函数创建
+---
 
+#### main函数创建
 ```go
 func main() {
 	rtr := router.Routers() // 配置gin启动 来源于下文中的方法
@@ -48,6 +51,8 @@ func main() {
 	start.GracefulShutdown(server) // 优雅停服
 }
 ```
+
+---
 
 #### 必须创建router文件：
 ```go
@@ -76,6 +81,8 @@ func Routers() *gin.Engine {
 	return rtr
 }
 ```
+
+---
 
 #### 创建全局业务错误处理：
 ```go
@@ -113,6 +120,8 @@ func init() {
 	errs.AddErrs(CodeDescMap) // 初始化
 }
 ```
+
+---
 
 #### 创建controller：
 ```go
@@ -169,8 +178,6 @@ func SignIn(c *gin.Context) {
 }
 
 /**
- * @Author: MassAdobe
- * @TIME: 2020/12/18 2:51 下午
  * @Description: 获取用户信息(GET)
 **/
 func GetUser(c *gin.Context) {
@@ -192,8 +199,6 @@ func GetUser(c *gin.Context) {
 }
 
 /**
- * @Author: MassAdobe
- * @TIME: 2020/12/21 9:30 上午
  * @Description: 获取用户额外信息(GET)
 **/
 func GetUserExternal(c *gin.Context) {
@@ -315,6 +320,8 @@ func DeleteUser(c *gin.Context) {
 }
 ```
 
+---
+
 #### 创建service
 ```go
 import (
@@ -381,6 +388,8 @@ func (this *Login) DeleteUser(id int) {
 	logs.Lg.Debug("删除用户-Service", this.C)
 }
 ```
+
+---
 
 #### 创建Dao类
 ##### 基于gorm框架
@@ -564,6 +573,8 @@ type UserRoleEntity struct {
 }
 ```
 
+---
+
 #### 接口出入参
 ```go
 /**
@@ -601,5 +612,126 @@ type SignInRtn struct {
 	NacosTestInt    int    `json:"nacos_test_int"`
 	NacosTestString string `json:"nacos_test_string"`
 	NacosTestBool   bool   `json:"nacos_test_bool"`
+}
+```
+
+---
+
+#### feign接口
+##### controller
+```go
+import (
+	"github.com/MassAdobe/go-gin/logs"
+	"github.com/MassAdobe/go-gin/validated"
+	"github.com/gin-gonic/gin"
+	"strconv"
+)
+
+/**
+ * @Description: 获取用户额外信息
+**/
+func GetUserExternal(c *gin.Context) {
+	logs.Lg.Info("获取用户额外信息(GET)", c)
+	userExternalParam := new(UserExternalParam)
+	userExternalParam.UserId, _ = strconv.Atoi(c.Query("user_id")) // 用户ID
+	validated.CheckParams(userExternalParam)                       // 检查入参
+	// 返回信息
+	validated.SuccResFeign(c, &UserExternalRtn{
+		UserType: "A",
+		UserSex:  "男",
+	})
+}
+
+/**
+ * @Description: 获取用户额外信息
+**/
+func PostUserExternal(c *gin.Context) {
+	logs.Lg.Info("获取用户额外信息(POST)", c)
+	userExternalParam := new(UserExternalParam)
+	validated.BindAndCheck(c, userExternalParam)
+	// 返回信息
+	validated.SuccResFeign(c, &UserExternalRtn{
+		UserType: "B",
+		UserSex:  "女",
+	})
+}
+
+/**
+ * @Description: 获取用户额外信息
+**/
+func PutUserExternal(c *gin.Context) {
+	logs.Lg.Info("获取用户额外信息(PUT)", c)
+	userExternalParam := new(UserExternalParam)
+	userExternalParam.UserId, _ = strconv.Atoi(c.Query("user_id")) // 用户ID
+	validated.CheckParams(userExternalParam)                       // 检查入参
+	// 返回信息
+	validated.SuccResFeign(c, &UserExternalRtn{
+		UserType: "C",
+		UserSex:  "男",
+	})
+}
+
+/**
+ * @Description: 获取用户额外信息
+**/
+func DeleteUserExternal(c *gin.Context) {
+	logs.Lg.Info("获取用户额外信息(DELETE)", c)
+	userExternalParam := new(UserExternalParam)
+	userExternalParam.UserId, _ = strconv.Atoi(c.Query("user_id")) // 用户ID
+	validated.CheckParams(userExternalParam)                       // 检查入参
+	// 返回信息
+	validated.SuccResFeign(c, &UserExternalRtn{
+		UserType: "D",
+		UserSex:  "女",
+	})
+}
+```
+
+##### 参数
+```go
+/**
+ * @Description: UserExternal入参
+**/
+type UserExternalParam struct {
+	UserId int `json:"user_id" validate:"required" comment:"用户ID"`
+}
+
+/**
+ * @Description: UserExternal出参
+**/
+type UserExternalRtn struct {
+	UserType string `json:"user_type"`
+	UserSex  string `json:"user_sex"`
+}
+```
+
+##### routers
+```go
+import (
+	"com.jptaker/go-framework-provider/controller"
+	"com.jptaker/go-framework-provider/external/goFramework"
+	"github.com/MassAdobe/go-gin/errs"
+	"github.com/MassAdobe/go-gin/filter"
+	"github.com/MassAdobe/go-gin/nacos"
+	"github.com/gin-gonic/gin"
+)
+
+/**
+ * @Description: 配置路由组
+**/
+func Routers() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+	rtr := gin.New()
+	rtr.NoMethod(errs.HandleNotFound) // 处理没有相关方法时的错误处理
+	rtr.NoRoute(errs.HandleNotFound)  // 处理没有相关路由时的错误处理
+	rtr.Use(errs.ErrHandler())        // 全局错误处理
+	goFrameworkFeign := rtr.Group(nacos.RequestPath("feign")).Use(filter.SetTraceAndStep())
+	{
+		goFrameworkFeign.GET("/getUserExternal", goFramework.GetUserExternal)          // 获取用户额外信息
+		goFrameworkFeign.POST("/postUserExternal", goFramework.PostUserExternal)       // 获取用户额外信息
+		goFrameworkFeign.PUT("/putUserExternal", goFramework.PutUserExternal)          // 获取用户额外信息
+		goFrameworkFeign.DELETE("/deleteUserExternal", goFramework.DeleteUserExternal) // 获取用户额外信息
+	}
+	return rtr
 }
 ```
