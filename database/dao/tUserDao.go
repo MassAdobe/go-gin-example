@@ -6,10 +6,10 @@
 package dao
 
 import (
-	"github.com/MassAdobe/go-gin-example/constants"
 	"github.com/MassAdobe/go-gin-example/database/entity"
 	"github.com/MassAdobe/go-gin-example/params"
 	"github.com/MassAdobe/go-gin-example/wrong"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/context"
 	"github.com/MassAdobe/go-gin/db"
 	"github.com/MassAdobe/go-gin/errs"
@@ -36,7 +36,7 @@ type TUserDao struct {
 **/
 func (this *TUserDao) GetUserInfo(userId int) (user *entity.TUser) {
 	user = new(entity.TUser)
-	if find := db.Read.Table(this.Table.TableName()).Where("deleted = ? and id = ?", constants.UNDELETED, userId).Find(&user); find.Error != nil && find.Error != gorm.ErrRecordNotFound {
+	if find := db.Read.Table(this.Table.TableName()).Where("deleted = ? and id = ?", constants.NOT_DELETED, userId).Find(&user); find.Error != nil && find.Error != gorm.ErrRecordNotFound {
 		logs.Lg.Error("根据ID获取用户信息", find.Error, this.C)
 		panic(errs.NewError(wrong.ErrFindUserInfoCode))
 	}
@@ -81,7 +81,7 @@ func (this *TUserDao) UpdateUser(id int, username string) {
  * @Description: 删除用户
 **/
 func (this *TUserDao) DeleteUser(id int) {
-	user := &entity.TUser{Deleted: constants.DELETED, UpdatedBy: 1, UpdatedTm: time.Now()}
+	user := &entity.TUser{Deleted: constants.NOT_DELETED, UpdatedBy: 1, UpdatedTm: time.Now()}
 	if update := db.Write.Table(this.Table.TableName()).Where("id = ?", id).Update(&user); update.Error != nil {
 		logs.Lg.Error("删除用户", update.Error, this.C)
 		panic(errs.NewError(wrong.ErrAddUserCode))
