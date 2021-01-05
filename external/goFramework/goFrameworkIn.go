@@ -7,9 +7,9 @@ package goFramework
 
 import (
 	"encoding/json"
+	"github.com/MassAdobe/go-gin/context"
 	"github.com/MassAdobe/go-gin/errs"
 	"github.com/MassAdobe/go-gin/http"
-	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -22,7 +22,7 @@ const (
  * @TIME: 2020/12/18 6:33 下午
  * @Description: 获取用户额外信息
 **/
-func GetUserExternal(userId int, c *gin.Context) *UserExternalRtn {
+func GetUserExternal(userId int, c *context.Context) *UserExternalRtn {
 	feign := &http.FeignRequest{
 		Body:       UserExternalParam{UserId: userId},              // 请求参数，可以为空
 		ServerName: GO_FRAMEWORK_PROVIDER_SERVER_NAME,              // 服务名，不能为空
@@ -46,7 +46,7 @@ func GetUserExternal(userId int, c *gin.Context) *UserExternalRtn {
  * @TIME: 2020/12/18 6:33 下午
  * @Description: 获取用户额外信息
 **/
-func PostUserExternal(userId int, c *gin.Context) *UserExternalRtn {
+func PostUserExternal(userId int, c *context.Context) *UserExternalRtn {
 	feign := &http.FeignRequest{
 		Body:       UserExternalParam{UserId: userId},               // 请求参数，可以为空
 		ServerName: GO_FRAMEWORK_PROVIDER_SERVER_NAME,               // 服务名，不能为空
@@ -70,7 +70,7 @@ func PostUserExternal(userId int, c *gin.Context) *UserExternalRtn {
  * @TIME: 2020/12/18 6:33 下午
  * @Description: 获取用户额外信息
 **/
-func PutUserExternal(userId int, c *gin.Context) *UserExternalRtn {
+func PutUserExternal(userId int, c *context.Context) *UserExternalRtn {
 	feign := &http.FeignRequest{
 		Body:       UserExternalParam{UserId: userId},              // 请求参数，可以为空
 		ServerName: GO_FRAMEWORK_PROVIDER_SERVER_NAME,              // 服务名，不能为空
@@ -94,7 +94,7 @@ func PutUserExternal(userId int, c *gin.Context) *UserExternalRtn {
  * @TIME: 2020/12/18 6:33 下午
  * @Description: 获取用户额外信息
 **/
-func DeleteUserExternal(userId int, c *gin.Context) *UserExternalRtn {
+func DeleteUserExternal(userId int, c *context.Context) *UserExternalRtn {
 	feign := &http.FeignRequest{
 		Body:       UserExternalParam{UserId: userId},                 // 请求参数，可以为空
 		ServerName: GO_FRAMEWORK_PROVIDER_SERVER_NAME,                 // 服务名，不能为空

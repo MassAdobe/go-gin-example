@@ -10,11 +10,11 @@ import (
 	"github.com/MassAdobe/go-gin-example/database/entity"
 	"github.com/MassAdobe/go-gin-example/params"
 	"github.com/MassAdobe/go-gin-example/wrong"
+	"github.com/MassAdobe/go-gin/context"
 	"github.com/MassAdobe/go-gin/db"
 	"github.com/MassAdobe/go-gin/errs"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/systemUtils"
-	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -26,7 +26,7 @@ import (
 **/
 type TUserDao struct {
 	Table *entity.TUser
-	C     *gin.Context
+	C     *context.Context
 }
 
 /**

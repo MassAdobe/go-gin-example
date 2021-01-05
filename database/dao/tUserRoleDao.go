@@ -7,10 +7,10 @@ package dao
 
 import (
 	"github.com/MassAdobe/go-gin-example/database/entity"
-	"github.com/gin-gonic/gin"
+	"github.com/MassAdobe/go-gin/context"
 )
 
 type TUserRoleDao struct {
 	Table *entity.TUserRole
-	C     *gin.Context
+	C     *context.Context
 }

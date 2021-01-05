@@ -1,9 +1,7 @@
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/MassAdobe/go-gin v1.1.0 h1:ndCX3q98Xj5u2vA+WGhGPiHbHH86kOSx/iSCxIk9L18=
-github.com/MassAdobe/go-gin v1.1.0/go.mod h1:PBEXc4p05F43iWlHSldebLsPEl1hE34vZm0i5qC4BF8=
-github.com/MassAdobe/go-gin v1.2.0 h1:8+odkSA7F479qARrkcVKzac/ZTD88ubB0EAbVugK66g=
-github.com/MassAdobe/go-gin v1.2.0/go.mod h1:PBEXc4p05F43iWlHSldebLsPEl1hE34vZm0i5qC4BF8=
+github.com/MassAdobe/go-gin v1.2.1 h1:wkf/dFRMy0AQXkQi45cN5RRDtYskgzlFMjJ/V0bRdBc=
+github.com/MassAdobe/go-gin v1.2.1/go.mod h1:PBEXc4p05F43iWlHSldebLsPEl1hE34vZm0i5qC4BF8=
 github.com/PuerkitoBio/goquery v1.5.1/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=
 github.com/aliyun/alibaba-cloud-sdk-go v1.61.18 h1:zOVTBdCKFd9JbCKz9/nt+FovbjPFmb7mUnp8nH9fQBA=
 github.com/aliyun/alibaba-cloud-sdk-go v1.61.18/go.mod h1:v8ESoHo4SyHmuB4b1tJqDHxfTGEciD+yhvOU/5s1Rfk=

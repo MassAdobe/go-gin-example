@@ -10,12 +10,12 @@ import (
 	"github.com/MassAdobe/go-gin-example/database/entity"
 	"github.com/MassAdobe/go-gin-example/database/joinDao"
 	"github.com/MassAdobe/go-gin-example/params"
+	"github.com/MassAdobe/go-gin/context"
 	"github.com/MassAdobe/go-gin/logs"
-	"github.com/gin-gonic/gin"
 )
 
 type Login struct {
-	C *gin.Context
+	C *context.Context
 }
 
 /**
@@ -26,7 +26,7 @@ type Login struct {
 func (this *Login) GetUserInfo(userId int) (user *entity.TUser) {
 	tUserDao := &dao.TUserDao{C: this.C} // 实例化Dao
 	user = tUserDao.GetUserInfo(userId)
-	logs.Lg.Debug("根据ID获取用户信息-Service", this.C, logs.Desc(user))
+	this.C.Debug("根据ID获取用户信息-Service", logs.Desc(user))
 	return
 }
 
@@ -38,7 +38,7 @@ func (this *Login) GetUserInfo(userId int) (user *entity.TUser) {
 func (this *Login) GetUserRoleInfo(userId int) (userRole *entity.UserRoleEntity) {
 	userRoleDao := &joinDao.UserRoleDao{C: this.C} // 实例化Dao
 	userRole = userRoleDao.GetUserAndRoleInfoByUserId(userId)
-	logs.Lg.Debug("根据ID获取用户角色信息-Service", this.C, logs.Desc(userRole))
+	this.C.Debug("根据ID获取用户角色信息-Service", logs.Desc(userRole))
 	return
 }
 
@@ -50,7 +50,7 @@ func (this *Login) GetUserRoleInfo(userId int) (userRole *entity.UserRoleEntity)
 func (this *Login) AddUser(user *params.AddUserParam) int {
 	tUserDao := &dao.TUserDao{C: this.C} // 实例化Dao
 	id := tUserDao.AddUser(user)
-	logs.Lg.Debug("新增用户-Service", this.C, logs.Desc(id))
+	this.C.Debug("新增用户-Service", logs.Desc(id))
 	return id
 }
 
@@ -62,7 +62,7 @@ func (this *Login) AddUser(user *params.AddUserParam) int {
 func (this *Login) UpdateUser(id int, username string) {
 	tUserDao := &dao.TUserDao{C: this.C} // 实例化Dao
 	tUserDao.UpdateUser(id, username)
-	logs.Lg.Debug("更新用户-Service", this.C)
+	this.C.Debug("更新用户-Service")
 }
 
 /**
@@ -73,5 +73,5 @@ func (this *Login) UpdateUser(id int, username string) {
 func (this *Login) DeleteUser(id int) {
 	tUserDao := &dao.TUserDao{C: this.C} // 实例化Dao
 	tUserDao.DeleteUser(id)
-	logs.Lg.Debug("删除用户-Service", this.C)
+	this.C.Debug("删除用户-Service")
 }

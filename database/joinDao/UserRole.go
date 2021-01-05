@@ -8,14 +8,14 @@ package joinDao
 import (
 	"github.com/MassAdobe/go-gin-example/database/entity"
 	"github.com/MassAdobe/go-gin-example/wrong"
+	"github.com/MassAdobe/go-gin/context"
 	"github.com/MassAdobe/go-gin/db"
 	"github.com/MassAdobe/go-gin/errs"
 	"github.com/MassAdobe/go-gin/logs"
-	"github.com/gin-gonic/gin"
 )
 
 type UserRoleDao struct {
-	C *gin.Context
+	C *context.Context
 }
 
 /**
@@ -40,9 +40,9 @@ where a.deleted = '0' and a.id = ?;
 `
 	userRole = new(entity.UserRoleEntity)
 	if err := db.Read.Raw(sql, userId).Scan(&userRole).Error; err != nil {
-		logs.Lg.Error("根据用户ID获取用户和角色信息", err, this.C)
+		this.C.Error("根据用户ID获取用户和角色信息", err)
 		panic(errs.NewError(wrong.ErrFindUserInfoCode))
 	}
-	logs.Lg.Debug("根据用户ID获取用户和角色信息-Dao", logs.Desc(userRole), this.C)
+	this.C.Debug("根据用户ID获取用户和角色信息-Dao", logs.Desc(userRole))
 	return
 }
