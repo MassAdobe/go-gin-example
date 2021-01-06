@@ -712,19 +712,23 @@ import (
 /**
  * @Description: 配置路由组
 **/
-func Routers() *gin.Engine {
-	gin.SetMode(gin.ReleaseMode)
-	rtr := gin.New()
-	rtr.NoMethod(errs.HandleNotFound) // 处理没有相关方法时的错误处理
-	rtr.NoRoute(errs.HandleNotFound)  // 处理没有相关路由时的错误处理
-	rtr.Use(errs.ErrHandler())        // 全局错误处理
-	goFrameworkFeign := rtr.Group(nacos.RequestPath("feign")).Use(filter.SetTraceAndStep())
-	{
-		goFrameworkFeign.GET("/getUserExternal", context.Handle(goFramework.GetUserExternal))          // 获取用户额外信息
-		goFrameworkFeign.POST("/postUserExternal", context.Handle(goFramework.PostUserExternal))       // 获取用户额外信息
-		goFrameworkFeign.PUT("/putUserExternal", context.Handle(goFramework.PutUserExternal))          // 获取用户额外信息
-		goFrameworkFeign.DELETE("/deleteUserExternal", context.Handle(goFramework.DeleteUserExternal)) // 获取用户额外信息
-	}
-	return rtr
+func Routers() (rtr *gin.Engine) {
+    rtr = context.NewRouter()
+    // 登录
+    login := rtr.Group(nacos.RequestPath("login")).Use(filter.SetTraceAndStep())
+    {
+        login.POST("/signIn", context.Handle(controller.SignIn))                       // 登录
+        login.GET("/getUser", context.Handle(controller.GetUser))                      // 获取用户信息
+        login.GET("/getUserExternal", context.Handle(controller.GetUserExternal))      // 获取用户额外信息
+        login.POST("/postUserExternal", context.Handle(controller.PostUserExternal))   // 获取用户额外信息
+        login.PUT("/putUserExternal", context.Handle(controller.PutUserExternal))      // 获取用户额外信息
+        login.DELETE("/deleteUserExternal", context.Handle(controller.DeleteExternal)) // 获取用户额外信息
+        login.GET("/getUserInfo", context.Handle(controller.GetUserInfo))              // 根据ID获取用户信息
+        login.GET("/getUserRoleInfo", context.Handle(controller.GetUserRoleInfo))      // 根据ID获取用户角色信息
+        login.POST("/addUser", context.Handle(controller.AddUser))                     // 新增用户
+        login.PUT("/updateUser", context.Handle(controller.UpdateUser))                // 更新用户
+        login.DELETE("/deleteUser", context.Handle(controller.DeleteUser))             // 删除用户
+    }
+    return
 }
 ```
