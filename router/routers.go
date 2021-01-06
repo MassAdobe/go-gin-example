@@ -8,7 +8,6 @@ package router
 import (
 	"github.com/MassAdobe/go-gin-example/controller"
 	"github.com/MassAdobe/go-gin/context"
-	"github.com/MassAdobe/go-gin/errs"
 	"github.com/MassAdobe/go-gin/filter"
 	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/gin-gonic/gin"
@@ -19,12 +18,8 @@ import (
  * @TIME: 2020-04-26 21:08
  * @Description: 配置路由组
 **/
-func Routers() *gin.Engine {
-	gin.SetMode(gin.ReleaseMode)
-	rtr := gin.New()
-	rtr.NoMethod(errs.HandleNotFound) // 处理没有相关方法时的错误处理
-	rtr.NoRoute(errs.HandleNotFound)  // 处理没有相关路由时的错误处理
-	rtr.Use(errs.ErrHandler())        // 全局错误处理
+func Routers() (rtr *gin.Engine) {
+	rtr = context.NewRouter()
 	// 登录
 	login := rtr.Group(nacos.RequestPath("login")).Use(filter.SetTraceAndStep())
 	{
@@ -40,5 +35,5 @@ func Routers() *gin.Engine {
 		login.PUT("/updateUser", context.Handle(controller.UpdateUser))                // 更新用户
 		login.DELETE("/deleteUser", context.Handle(controller.DeleteUser))             // 删除用户
 	}
-	return rtr
+	return
 }

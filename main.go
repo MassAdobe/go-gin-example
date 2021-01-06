@@ -27,8 +27,8 @@ func main() {
 	server := &http.Server{ // 创建服务
 		Addr:           ":" + strconv.Itoa(int(nacos.InitConfiguration.Serve.Port)),
 		Handler:        rtr,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
+		ReadTimeout:    30 * time.Second,
+		WriteTimeout:   30 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 	logs.Lg.Info("启动", logs.Desc(fmt.Sprintf("启动端口: %d", nacos.InitConfiguration.Serve.Port)))

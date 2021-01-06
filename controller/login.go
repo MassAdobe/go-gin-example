@@ -17,6 +17,7 @@ import (
 	"github.com/MassAdobe/go-gin/validated"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 /**
@@ -51,7 +52,8 @@ func SignIn(c *context.Context) {
 	c.Debug("登录")
 	c.Info("登录", logs.Desc("abc"))
 	c.Error("登录", errors.New("login error"))
-	//panic(errs.NewError(wrong.ErrLoginCode))
+	// panic(errs.NewError(wrong.ErrLoginCode))
+	time.Sleep(time.Second * 10)
 	// 返回信息
 	validated.SuccRes(c, &params.SignInRtn{
 		UserName:        signInParam.UserName,
