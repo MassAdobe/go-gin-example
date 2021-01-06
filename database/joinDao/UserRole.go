@@ -8,14 +8,14 @@ package joinDao
 import (
 	"github.com/MassAdobe/go-gin-example/database/entity"
 	"github.com/MassAdobe/go-gin-example/wrong"
-	"github.com/MassAdobe/go-gin/context"
 	"github.com/MassAdobe/go-gin/db"
 	"github.com/MassAdobe/go-gin/errs"
+	"github.com/MassAdobe/go-gin/goContext"
 	"github.com/MassAdobe/go-gin/logs"
 )
 
 type UserRoleDao struct {
-	C *context.Context
+	C *goContext.Context
 }
 
 /**

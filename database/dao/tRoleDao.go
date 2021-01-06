@@ -7,12 +7,12 @@ package dao
 
 import (
 	"github.com/MassAdobe/go-gin-example/database/entity"
-	"github.com/MassAdobe/go-gin/context"
+	"github.com/MassAdobe/go-gin/goContext"
 )
 
 type TRoleDao struct {
 	Table *entity.TRole
-	C     *context.Context
+	C     *goContext.Context
 }
 
 /**

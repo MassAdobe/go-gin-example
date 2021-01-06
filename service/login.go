@@ -10,12 +10,12 @@ import (
 	"github.com/MassAdobe/go-gin-example/database/entity"
 	"github.com/MassAdobe/go-gin-example/database/joinDao"
 	"github.com/MassAdobe/go-gin-example/params"
-	"github.com/MassAdobe/go-gin/context"
+	"github.com/MassAdobe/go-gin/goContext"
 	"github.com/MassAdobe/go-gin/logs"
 )
 
 type Login struct {
-	C *context.Context
+	C *goContext.Context
 }
 
 /**

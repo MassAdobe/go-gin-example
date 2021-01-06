@@ -10,13 +10,14 @@ import (
 	"github.com/MassAdobe/go-gin-example/external/goFramework"
 	"github.com/MassAdobe/go-gin-example/params"
 	"github.com/MassAdobe/go-gin-example/service"
-	"github.com/MassAdobe/go-gin/context"
+	"github.com/MassAdobe/go-gin/goContext"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/MassAdobe/go-gin/systemUtils"
 	"github.com/MassAdobe/go-gin/validated"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 /**
@@ -45,13 +46,14 @@ func init() {
  * @TIME: 2020/12/18 1:07 下午
  * @Description: 登录
 **/
-func SignIn(c *context.Context) {
+func SignIn(c *goContext.Context) {
 	signInParam := new(params.SignInParam)
 	validated.BindAndCheck(c, signInParam)
 	c.Debug("登录")
 	c.Info("登录", logs.Desc("abc"))
 	c.Error("登录", errors.New("login error"))
 	// panic(errs.NewError(wrong.ErrLoginCode))
+	time.Sleep(time.Second * 10)
 	// 返回信息
 	validated.SuccRes(c, &params.SignInRtn{
 		UserName:        signInParam.UserName,
@@ -68,21 +70,18 @@ func SignIn(c *context.Context) {
 * @TIME: 2020/12/18 2:51 下午
 * @Description: 获取用户信息
 **/
-func GetUser(c *context.Context) {
+func GetUser(c *goContext.Context) {
 	getUserParam := new(params.GetUserParam)
 	getUserParam.PageNum, _ = strconv.Atoi(c.GinContext.Query("page_num"))        // 获取参数
 	getUserParam.PageSize, _ = strconv.Atoi(c.GinContext.Query("page_size"))      // 获取参数
 	getUserParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id"))          // 获取参数
 	getUserParam.UserName, _ = url.QueryUnescape(c.GinContext.Query("user_name")) // 获取参数
 	validated.CheckParams(getUserParam)                                           // 检查入参
-	external := goFramework.GetUserExternal(getUserParam.UserId, c)
 	validated.SuccRes(c, &params.GetUserRtn{
 		UserId:   getUserParam.UserId,
 		UserName: getUserParam.UserName,
 		PageNum:  getUserParam.PageNum,
 		PageSize: getUserParam.PageSize,
-		UserType: external.UserType,
-		UserSex:  external.UserSex,
 	})
 }
 
@@ -91,7 +90,7 @@ func GetUser(c *context.Context) {
 * @TIME: 2020/12/21 9:30 上午
 * @Description: 获取用户额外信息
 **/
-func GetUserExternal(c *context.Context) {
+func GetUserExternal(c *goContext.Context) {
 	c.Info("获取用户额外信息(GET)")
 	getUserExternalParam := new(params.GetUserExternalParam)
 	getUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
@@ -108,7 +107,7 @@ func GetUserExternal(c *context.Context) {
 * @TIME: 2020/12/21 9:30 上午
 * @Description: 获取用户额外信息
 **/
-func PostUserExternal(c *context.Context) {
+func PostUserExternal(c *goContext.Context) {
 	logs.Lg.Info("获取用户额外信息(POST)", c)
 	postUserParam := new(params.PostUserExternalParam)
 	validated.BindAndCheck(c, postUserParam)
@@ -124,7 +123,7 @@ func PostUserExternal(c *context.Context) {
 * @TIME: 2020/12/21 9:30 上午
 * @Description: 获取用户额外信息
 **/
-func PutUserExternal(c *context.Context) {
+func PutUserExternal(c *goContext.Context) {
 	logs.Lg.Info("获取用户额外信息(PUT)", c)
 	putUserExternalParam := new(params.PutUserExternalParam)
 	putUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
@@ -141,7 +140,7 @@ func PutUserExternal(c *context.Context) {
 * @TIME: 2020/12/21 9:30 上午
 * @Description: 获取用户额外信息
 **/
-func DeleteExternal(c *context.Context) {
+func DeleteExternal(c *goContext.Context) {
 	logs.Lg.Info("获取用户额外信息(DELETE)", c)
 	deleteUserExternalParam := new(params.DeleteUserExternalParam)
 	deleteUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
@@ -158,7 +157,7 @@ func DeleteExternal(c *context.Context) {
 * @TIME: 2020/12/31 1:17 下午
 * @Description: 根据ID获取用户信息
 **/
-func GetUserInfo(c *context.Context) {
+func GetUserInfo(c *goContext.Context) {
 	id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
 	loginService := &service.Login{C: c} // 实例化Service
 	rtn := new(params.GetUserInfoRtn)
@@ -171,7 +170,7 @@ func GetUserInfo(c *context.Context) {
 * @TIME: 2020/12/31 1:18 下午
 * @Description: 根据ID获取用户角色信息
 **/
-func GetUserRoleInfo(c *context.Context) {
+func GetUserRoleInfo(c *goContext.Context) {
 	id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
 	loginService := &service.Login{C: c} // 实例化Service
 	rtn := new(params.GetUserRoleInfoRtn)
@@ -184,7 +183,7 @@ func GetUserRoleInfo(c *context.Context) {
 * @TIME: 2020/12/31 6:01 下午
 * @Description: 新增用户
 **/
-func AddUser(c *context.Context) {
+func AddUser(c *goContext.Context) {
 	addUser := new(params.AddUserParam)
 	validated.BindAndCheck(c, addUser)
 	loginService := &service.Login{C: c} // 实例化Service
@@ -196,7 +195,7 @@ func AddUser(c *context.Context) {
 * @TIME: 2020/12/31 6:21 下午
 * @Description: 更新用户
 **/
-func UpdateUser(c *context.Context) {
+func UpdateUser(c *goContext.Context) {
 	id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
 	userName, _ := url.QueryUnescape(c.GinContext.Query("user_name"))
 	loginService := &service.Login{C: c} // 实例化Service
@@ -209,7 +208,7 @@ func UpdateUser(c *context.Context) {
 * @TIME: 2020/12/31 6:26 下午
 * @Description: 删除用户
 **/
-func DeleteUser(c *context.Context) {
+func DeleteUser(c *goContext.Context) {
 	id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
 	loginService := &service.Login{C: c} // 实例化Service
 	loginService.DeleteUser(id)
