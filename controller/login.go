@@ -55,7 +55,7 @@ func SignIn(c *goContext.Context) {
 	// panic(errs.NewError(wrong.ErrLoginCode))
 	time.Sleep(time.Second * 10)
 	// 返回信息
-	validated.SuccRes(c, &params.SignInRtn{
+	c.SuccRes(&params.SignInRtn{
 		UserName:        signInParam.UserName,
 		PassWord:        signInParam.PassWord,
 		Timestamp:       signInParam.Timestamp,
@@ -77,7 +77,7 @@ func GetUser(c *goContext.Context) {
 	getUserParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id"))          // 获取参数
 	getUserParam.UserName, _ = url.QueryUnescape(c.GinContext.Query("user_name")) // 获取参数
 	validated.CheckParams(getUserParam)                                           // 检查入参
-	validated.SuccRes(c, &params.GetUserRtn{
+	c.SuccRes(&params.GetUserRtn{
 		UserId:   getUserParam.UserId,
 		UserName: getUserParam.UserName,
 		PageNum:  getUserParam.PageNum,
@@ -96,7 +96,7 @@ func GetUserExternal(c *goContext.Context) {
 	getUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
 	validated.CheckParams(getUserExternalParam)                                  // 检查入参
 	external := goFramework.GetUserExternal(getUserExternalParam.UserId, c)
-	validated.SuccRes(c, &params.GetUserExternalRtn{
+	c.SuccRes(&params.GetUserExternalRtn{
 		UserType: external.UserType,
 		UserSex:  external.UserSex,
 	})
@@ -112,7 +112,7 @@ func PostUserExternal(c *goContext.Context) {
 	postUserParam := new(params.PostUserExternalParam)
 	validated.BindAndCheck(c, postUserParam)
 	external := goFramework.PostUserExternal(postUserParam.UserId, c)
-	validated.SuccRes(c, &params.PostUserExternalRtn{
+	c.SuccRes(&params.PostUserExternalRtn{
 		UserType: external.UserType,
 		UserSex:  external.UserSex,
 	})
@@ -129,7 +129,7 @@ func PutUserExternal(c *goContext.Context) {
 	putUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
 	validated.CheckParams(putUserExternalParam)                                  // 检查入参
 	external := goFramework.PutUserExternal(putUserExternalParam.UserId, c)
-	validated.SuccRes(c, &params.PutUserExternalRtn{
+	c.SuccRes(&params.PutUserExternalRtn{
 		UserType: external.UserType,
 		UserSex:  external.UserSex,
 	})
@@ -146,7 +146,7 @@ func DeleteExternal(c *goContext.Context) {
 	deleteUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
 	validated.CheckParams(deleteUserExternalParam)                                  // 检查入参
 	external := goFramework.DeleteUserExternal(deleteUserExternalParam.UserId, c)
-	validated.SuccRes(c, &params.DeleteUserExternalRtn{
+	c.SuccRes(&params.DeleteUserExternalRtn{
 		UserType: external.UserType,
 		UserSex:  external.UserSex,
 	})
@@ -162,7 +162,7 @@ func GetUserInfo(c *goContext.Context) {
 	loginService := &service.Login{C: c} // 实例化Service
 	rtn := new(params.GetUserInfoRtn)
 	systemUtils.CopyProperty(rtn, loginService.GetUserInfo(id))
-	validated.SuccRes(c, rtn)
+	c.SuccRes(rtn)
 }
 
 /**
@@ -175,7 +175,7 @@ func GetUserRoleInfo(c *goContext.Context) {
 	loginService := &service.Login{C: c} // 实例化Service
 	rtn := new(params.GetUserRoleInfoRtn)
 	systemUtils.CopyProperty(rtn, loginService.GetUserRoleInfo(id))
-	validated.SuccRes(c, rtn)
+	c.SuccRes(rtn)
 }
 
 /**
@@ -187,7 +187,7 @@ func AddUser(c *goContext.Context) {
 	addUser := new(params.AddUserParam)
 	validated.BindAndCheck(c, addUser)
 	loginService := &service.Login{C: c} // 实例化Service
-	validated.SuccRes(c, loginService.AddUser(addUser))
+	c.SuccRes(loginService.AddUser(addUser))
 }
 
 /**
@@ -200,7 +200,7 @@ func UpdateUser(c *goContext.Context) {
 	userName, _ := url.QueryUnescape(c.GinContext.Query("user_name"))
 	loginService := &service.Login{C: c} // 实例化Service
 	loginService.UpdateUser(id, userName)
-	validated.SuccRes(c, nil)
+	c.SuccRes(nil)
 }
 
 /**
@@ -212,5 +212,5 @@ func DeleteUser(c *goContext.Context) {
 	id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
 	loginService := &service.Login{C: c} // 实例化Service
 	loginService.DeleteUser(id)
-	validated.SuccRes(c, nil)
+	c.SuccRes(nil)
 }

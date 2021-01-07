@@ -34,19 +34,34 @@ LogLevel: ''
 
 #### main函数创建
 ```go
+import (
+	"fmt"
+	"github.com/MassAdobe/go-gin-example/router"
+	"github.com/MassAdobe/go-gin/logs"
+	"github.com/MassAdobe/go-gin/nacos"
+	"github.com/MassAdobe/go-gin/start"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
+)
+
+/**
+ * @Description: 启动项
+**/
 func main() {
-	rtr := router.Routers() // 配置gin启动 来源于下文中的方法
+	rtr := router.Routers() // 配置gin启动
 	server := &http.Server{ // 创建服务
 		Addr:           ":" + strconv.Itoa(int(nacos.InitConfiguration.Serve.Port)),
 		Handler:        rtr,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
+		ReadTimeout:    30 * time.Second,
+		WriteTimeout:   30 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	logs.Lg.Info("启动", logs.Desc(fmt.Sprintf("启动端口: %d", nacos.InitConfiguration.Serve.Port)))
+	logs.Lg.SysInfo("启动", logs.Desc(fmt.Sprintf("启动端口: %d", nacos.InitConfiguration.Serve.Port)))
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed { // 监听并启动服务
-			logs.Lg.Error("启动失败", err)
+			logs.Lg.SysError("启动失败", err)
 			os.Exit(1)
 		}
 	}()
@@ -58,29 +73,37 @@ func main() {
 
 #### 必须创建router文件：
 ```go
-// 主目录下创建router文件夹，创建routers文件，主要设置restFul接口路径和methods
-func Routers() *gin.Engine {
-    gin.SetMode(gin.ReleaseMode)
-    rtr := gin.New()
-    rtr.NoMethod(errs.HandleNotFound) // 处理没有相关方法时的错误处理
-    rtr.NoRoute(errs.HandleNotFound)  // 处理没有相关路由时的错误处理
-    rtr.Use(errs.ErrHandler())        // 全局错误处理
-    // 登录
-    login := rtr.Group(nacos.RequestPath("login")).Use(filter.SetTraceAndStep())
-    {
-        login.POST("/signIn", context.Handle(controller.SignIn))                       // 登录
-        login.GET("/getUser", context.Handle(controller.GetUser))                      // 获取用户信息
-        login.GET("/getUserExternal", context.Handle(controller.GetUserExternal))      // 获取用户额外信息
-        login.POST("/postUserExternal", context.Handle(controller.PostUserExternal))   // 获取用户额外信息
-        login.PUT("/putUserExternal", context.Handle(controller.PutUserExternal))      // 获取用户额外信息
-        login.DELETE("/deleteUserExternal", context.Handle(controller.DeleteExternal)) // 获取用户额外信息
-        login.GET("/getUserInfo", context.Handle(controller.GetUserInfo))              // 根据ID获取用户信息
-        login.GET("/getUserRoleInfo", context.Handle(controller.GetUserRoleInfo))      // 根据ID获取用户角色信息
-        login.POST("/addUser", context.Handle(controller.AddUser))                     // 新增用户
-        login.PUT("/updateUser", context.Handle(controller.UpdateUser))                // 更新用户
-        login.DELETE("/deleteUser", context.Handle(controller.DeleteUser))             // 删除用户
-    }
-    return rtr
+import (
+	"github.com/MassAdobe/go-gin-example/controller"
+	"github.com/MassAdobe/go-gin/filter"
+	"github.com/MassAdobe/go-gin/goContext"
+	"github.com/MassAdobe/go-gin/nacos"
+	"github.com/MassAdobe/go-gin/routers"
+	"github.com/gin-gonic/gin"
+)
+
+/**
+ * @Description: 配置路由组
+ * 主目录下创建router文件夹，创建routers文件，主要设置restFul接口路径和methods
+**/
+func Routers() (rtr *gin.Engine) {
+	rtr = routers.NewRouter()
+	// 登录
+	login := rtr.Group(nacos.RequestPath("login")).Use(filter.SetTraceAndStep())
+	{
+		login.POST("/signIn", goContext.Handle(controller.SignIn))                       // 登录
+		login.GET("/getUser", goContext.Handle(controller.GetUser))                      // 获取用户信息
+		login.GET("/getUserExternal", goContext.Handle(controller.GetUserExternal))      // 获取用户额外信息
+		login.POST("/postUserExternal", goContext.Handle(controller.PostUserExternal))   // 获取用户额外信息
+		login.PUT("/putUserExternal", goContext.Handle(controller.PutUserExternal))      // 获取用户额外信息
+		login.DELETE("/deleteUserExternal", goContext.Handle(controller.DeleteExternal)) // 获取用户额外信息
+		login.GET("/getUserInfo", goContext.Handle(controller.GetUserInfo))              // 根据ID获取用户信息
+		login.GET("/getUserRoleInfo", goContext.Handle(controller.GetUserRoleInfo))      // 根据ID获取用户角色信息
+		login.POST("/addUser", goContext.Handle(controller.AddUser))                     // 新增用户
+		login.PUT("/updateUser", goContext.Handle(controller.UpdateUser))                // 更新用户
+		login.DELETE("/deleteUser", goContext.Handle(controller.DeleteUser))             // 删除用户
+	}
+	return
 }
 ```
 
@@ -90,6 +113,9 @@ func Routers() *gin.Engine {
 ```go
 import "github.com/MassAdobe/go-gin/errs"
 
+/**
+ * @Description: 错误封装
+**/
 const (
 	//自定义错误码
 	ErrLoginCode = 1000 + iota // 登录错误
@@ -108,6 +134,9 @@ const (
 	ErrDeleteUserDesc       = "删除用户失败"
 )
 
+/**
+ * @Description: 错误参数体
+**/
 var CodeDescMap = map[int]string{
 	// 自定义错误
 	ErrLoginCode:            ErrLoginDesc,
@@ -118,8 +147,11 @@ var CodeDescMap = map[int]string{
 	ErrDeleteUserCode:       ErrDeleteUserDesc,
 }
 
+/**
+ * @Description: 初始化
+**/
 func init() {
-	errs.AddErrs(CodeDescMap) // 初始化
+	errs.AddErrs(CodeDescMap)
 }
 ```
 
@@ -132,13 +164,14 @@ import (
 	"github.com/MassAdobe/go-gin-example/external/goFramework"
 	"github.com/MassAdobe/go-gin-example/params"
 	"github.com/MassAdobe/go-gin-example/service"
+	"github.com/MassAdobe/go-gin/goContext"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/MassAdobe/go-gin/systemUtils"
 	"github.com/MassAdobe/go-gin/validated"
-	"github.com/gin-gonic/gin"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 /**
@@ -153,163 +186,161 @@ var (
 **/
 func init() {
 	// 注入其他实体类
-	//testNacos = &params.SignInNacos{}
-	testNacos = new(params.SignInNacos)
-	nacos.InsertSelfProfile(testNacos) // 使用nacos配置文件的自定义配置
+	//testNacos = &params.SignInNacos{} // ① 第一种实例化方式
+	testNacos = new(params.SignInNacos) // ② 第二种实例化方式
+	nacos.InsertSelfProfile(testNacos)  // 放入监听容器中
 }
 
 /**
  * @Description: 登录(POST)
 **/
-func SignIn(c *context.Context) {
-    signInParam := new(params.SignInParam)
-    validated.BindAndCheck(c, signInParam)
-    c.Debug("登录")
-    c.Info("登录", logs.Desc("abc"))
-    c.Error("登录", errors.New("login error"))
-    // panic(errs.NewError(wrong.ErrLoginCode))
-    // 返回信息
-    validated.SuccRes(c, &params.SignInRtn{
-        UserName:        signInParam.UserName,
-        PassWord:        signInParam.PassWord,
-        Timestamp:       signInParam.Timestamp,
-        NacosTestInt:    testNacos.NacosTestInt,
-        NacosTestBool:   testNacos.NacosTestStruct.NacosTestBool,
-        NacosTestString: testNacos.NacosTestStruct.NacosTestString,
-    })
+func SignIn(c *goContext.Context) {
+	signInParam := new(params.SignInParam)
+	validated.BindAndCheck(c, signInParam) // 获取传参
+	c.Debug("登录")
+	c.Info("登录", logs.Desc("abc"))
+	c.Error("登录", errors.New("login error"))
+	// panic(errs.NewError(wrong.ErrLoginCode)) // 使用系统panic方式
+	time.Sleep(time.Second * 10) // 测试请求超时
+	// 返回信息
+	c.SuccRes(&params.SignInRtn{
+		UserName:        signInParam.UserName,
+		PassWord:        signInParam.PassWord,
+		Timestamp:       signInParam.Timestamp,
+		NacosTestInt:    testNacos.NacosTestInt,
+		NacosTestBool:   testNacos.NacosTestStruct.NacosTestBool,
+		NacosTestString: testNacos.NacosTestStruct.NacosTestString,
+	})
 }
 
 /**
- * @Description: 获取用户信息(GET)
+* @Description: 获取用户信息(GET)
 **/
-func GetUser(c *context.Context) {
-    getUserParam := new(params.GetUserParam)
-    getUserParam.PageNum, _ = strconv.Atoi(c.GinContext.Query("page_num"))        // 获取参数
-    getUserParam.PageSize, _ = strconv.Atoi(c.GinContext.Query("page_size"))      // 获取参数
-    getUserParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id"))          // 获取参数
-    getUserParam.UserName, _ = url.QueryUnescape(c.GinContext.Query("user_name")) // 获取参数
-    validated.CheckParams(getUserParam)                                           // 检查入参
-    external := goFramework.GetUserExternal(getUserParam.UserId, c)
-    validated.SuccRes(c, &params.GetUserRtn{
-        UserId:   getUserParam.UserId,
-        UserName: getUserParam.UserName,
-        PageNum:  getUserParam.PageNum,
-        PageSize: getUserParam.PageSize,
-        UserType: external.UserType,
-        UserSex:  external.UserSex,
-    })
+func GetUser(c *goContext.Context) {
+	getUserParam := new(params.GetUserParam)
+	getUserParam.PageNum, _ = strconv.Atoi(c.GinContext.Query("page_num"))        // 获取参数
+	getUserParam.PageSize, _ = strconv.Atoi(c.GinContext.Query("page_size"))      // 获取参数
+	getUserParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id"))          // 获取参数
+	getUserParam.UserName, _ = url.QueryUnescape(c.GinContext.Query("user_name")) // 获取参数
+	validated.CheckParams(getUserParam)                                           // 检查入参
+	c.SuccRes(&params.GetUserRtn{
+		UserId:   getUserParam.UserId,
+		UserName: getUserParam.UserName,
+		PageNum:  getUserParam.PageNum,
+		PageSize: getUserParam.PageSize,
+	})
 }
 
 /**
- * @Description: 获取用户额外信息(GET)
+* @Description: 获取用户额外信息(GET-FEIGN)
 **/
-func GetUserExternal(c *context.Context) {
-    c.Info("获取用户额外信息(GET)")
-    getUserExternalParam := new(params.GetUserExternalParam)
-    getUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
-    validated.CheckParams(getUserExternalParam)                                  // 检查入参
-    external := goFramework.GetUserExternal(getUserExternalParam.UserId, c)
-    validated.SuccRes(c, &params.GetUserExternalRtn{
-        UserType: external.UserType,
-        UserSex:  external.UserSex,
-    })
+func GetUserExternal(c *goContext.Context) {
+	c.Info("获取用户额外信息(GET)")
+	getUserExternalParam := new(params.GetUserExternalParam)
+	getUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
+	validated.CheckParams(getUserExternalParam)                                  // 检查入参
+	external := goFramework.GetUserExternal(getUserExternalParam.UserId, c)      // 调用GET的feign方法
+	c.SuccRes(&params.GetUserExternalRtn{
+		UserType: external.UserType,
+		UserSex:  external.UserSex,
+	})
 }
 
 /**
- * @Description: 获取用户额外信息(POST)
+* @Description: 获取用户额外信息(POST-FEIGN)
 **/
-func PostUserExternal(c *context.Context) {
-    logs.Lg.Info("获取用户额外信息(POST)", c)
-    postUserParam := new(params.PostUserExternalParam)
-    validated.BindAndCheck(c, postUserParam)
-    external := goFramework.PostUserExternal(postUserParam.UserId, c)
-    validated.SuccRes(c, &params.PostUserExternalRtn{
-        UserType: external.UserType,
-        UserSex:  external.UserSex,
-    })
+func PostUserExternal(c *goContext.Context) {
+	logs.Lg.Info("获取用户额外信息(POST)", c)
+	postUserParam := new(params.PostUserExternalParam)
+	validated.BindAndCheck(c, postUserParam)
+	external := goFramework.PostUserExternal(postUserParam.UserId, c) // 调用POST的feign方法
+	c.SuccRes(&params.PostUserExternalRtn{
+		UserType: external.UserType,
+		UserSex:  external.UserSex,
+	})
 }
 
 /**
- * @Description: 获取用户额外信息(PUT)
+* @Description: 获取用户额外信息(PUT-FEIGN)
 **/
-func PutUserExternal(c *context.Context) {
-    logs.Lg.Info("获取用户额外信息(PUT)", c)
-    putUserExternalParam := new(params.PutUserExternalParam)
-    putUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
-    validated.CheckParams(putUserExternalParam)                                  // 检查入参
-    external := goFramework.PutUserExternal(putUserExternalParam.UserId, c)
-    validated.SuccRes(c, &params.PutUserExternalRtn{
-        UserType: external.UserType,
-        UserSex:  external.UserSex,
-    })
+func PutUserExternal(c *goContext.Context) {
+	logs.Lg.Info("获取用户额外信息(PUT)", c)
+	putUserExternalParam := new(params.PutUserExternalParam)
+	putUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
+	validated.CheckParams(putUserExternalParam)                                  // 检查入参
+	external := goFramework.PutUserExternal(putUserExternalParam.UserId, c)      // 调用PUT的feign方法
+	c.SuccRes(&params.PutUserExternalRtn{
+		UserType: external.UserType,
+		UserSex:  external.UserSex,
+	})
 }
 
 /**
- * @Description: 获取用户额外信息(DELETE)
+* @Description: 获取用户额外信息(DELETE-FEIGN)
 **/
-func DeleteExternal(c *context.Context) {
-    logs.Lg.Info("获取用户额外信息(DELETE)", c)
-    deleteUserExternalParam := new(params.DeleteUserExternalParam)
-    deleteUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
-    validated.CheckParams(deleteUserExternalParam)                                  // 检查入参
-    external := goFramework.DeleteUserExternal(deleteUserExternalParam.UserId, c)
-    validated.SuccRes(c, &params.DeleteUserExternalRtn{
-        UserType: external.UserType,
-        UserSex:  external.UserSex,
-    })
+func DeleteExternal(c *goContext.Context) {
+	logs.Lg.Info("获取用户额外信息(DELETE)", c)
+	deleteUserExternalParam := new(params.DeleteUserExternalParam)
+	deleteUserExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 获取参数
+	validated.CheckParams(deleteUserExternalParam)                                  // 检查入参
+	external := goFramework.DeleteUserExternal(deleteUserExternalParam.UserId, c)   // 调用DELETE的feign方法
+	c.SuccRes(&params.DeleteUserExternalRtn{
+		UserType: external.UserType,
+		UserSex:  external.UserSex,
+	})
 }
 
 /**
- * @Description: 根据ID获取用户信息
+* @Description: 根据ID获取用户信息
 **/
-func GetUserInfo(c *context.Context) {
-    id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
-    loginService := &service.Login{C: c} // 实例化Service
-    rtn := new(params.GetUserInfoRtn)
-    systemUtils.CopyProperty(rtn, loginService.GetUserInfo(id))
-    validated.SuccRes(c, rtn)
+func GetUserInfo(c *goContext.Context) {
+	id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
+	loginService := &service.Login{C: c} // 实例化Service
+	rtn := new(params.GetUserInfoRtn)
+	systemUtils.CopyProperty(rtn, loginService.GetUserInfo(id)) // 调用方法
+	c.SuccRes(rtn)
 }
 
 /**
- * @Description: 根据ID获取用户角色信息
+* @Description: 根据ID获取用户角色信息
 **/
-func GetUserRoleInfo(c *context.Context) {
-    id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
-    loginService := &service.Login{C: c} // 实例化Service
-    rtn := new(params.GetUserRoleInfoRtn)
-    systemUtils.CopyProperty(rtn, loginService.GetUserRoleInfo(id))
-    validated.SuccRes(c, rtn)
+func GetUserRoleInfo(c *goContext.Context) {
+	id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
+	loginService := &service.Login{C: c} // 实例化Service
+	rtn := new(params.GetUserRoleInfoRtn)
+	systemUtils.CopyProperty(rtn, loginService.GetUserRoleInfo(id)) // 调用方法
+	c.SuccRes(rtn)
 }
 
 /**
- * @Description: 新增用户
+* @Description: 新增用户
 **/
-func AddUser(c *gin.Context) {
-    addUser := new(params.AddUserParam)
-    validated.BindAndCheck(c, addUser)
-    loginService := &service.Login{C: c} // 实例化Service
-    validated.SuccRes(c, loginService.AddUser(addUser))
+func AddUser(c *goContext.Context) {
+	addUser := new(params.AddUserParam)
+	validated.BindAndCheck(c, addUser)
+	loginService := &service.Login{C: c} // 实例化Service
+	c.SuccRes(loginService.AddUser(addUser)) // 调用方法
 }
 
 /**
- * @Description: 更新用户
+* @Description: 更新用户
 **/
-func UpdateUser(c *gin.Context) {
-    id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
-    userName, _ := url.QueryUnescape(c.GinContext.Query("user_name"))
-    loginService := &service.Login{C: c} // 实例化Service
-    loginService.UpdateUser(id, userName)
-    validated.SuccRes(c, nil)
+func UpdateUser(c *goContext.Context) {
+	id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
+	userName, _ := url.QueryUnescape(c.GinContext.Query("user_name"))
+	loginService := &service.Login{C: c} // 实例化Service
+	loginService.UpdateUser(id, userName) // 调用方法
+	c.SuccRes(nil)
 }
 
 /**
- * @Description: 删除用户
+* @Description: 删除用户
 **/
-func DeleteUser(c *gin.Context) {
-    id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
-    loginService := &service.Login{C: c} // 实例化Service
-    loginService.DeleteUser(id)         
-    validated.SuccRes(c, nil)
+func DeleteUser(c *goContext.Context) {
+	id, _ := strconv.Atoi(c.GinContext.Query("user_id"))
+	loginService := &service.Login{C: c} // 实例化Service
+	loginService.DeleteUser(id) // 调用方法
+	c.SuccRes(nil)
 }
 ```
 
@@ -322,15 +353,12 @@ import (
 	"github.com/MassAdobe/go-gin-example/database/entity"
 	"github.com/MassAdobe/go-gin-example/database/joinDao"
 	"github.com/MassAdobe/go-gin-example/params"
+	"github.com/MassAdobe/go-gin/goContext"
 	"github.com/MassAdobe/go-gin/logs"
-	"github.com/gin-gonic/gin"
 )
 
-/**
- * @Description: 接口实体类
-**/
 type Login struct {
-	C *context.Context // 需要调用上下文
+	C *goContext.Context
 }
 
 /**
@@ -338,7 +366,7 @@ type Login struct {
 **/
 func (this *Login) GetUserInfo(userId int) (user *entity.TUser) {
 	tUserDao := &dao.TUserDao{C: this.C} // 实例化Dao
-	user = tUserDao.GetUserInfo(userId)  // 调用Dao方法
+	user = tUserDao.GetUserInfo(userId)
 	this.C.Debug("根据ID获取用户信息-Service", logs.Desc(user))
 	return
 }
@@ -347,9 +375,9 @@ func (this *Login) GetUserInfo(userId int) (user *entity.TUser) {
  * @Description: 根据ID获取用户角色信息
 **/
 func (this *Login) GetUserRoleInfo(userId int) (userRole *entity.UserRoleEntity) {
-	userRoleDao := &joinDao.UserRoleDao{C: this.C}            // 实例化Dao
-	userRole = userRoleDao.GetUserAndRoleInfoByUserId(userId) // 调用Dao方法
-    this.C.Debug("根据ID获取用户角色信息-Service", logs.Desc(userRole))
+	userRoleDao := &joinDao.UserRoleDao{C: this.C} // 实例化Dao
+	userRole = userRoleDao.GetUserAndRoleInfoByUserId(userId)
+	this.C.Debug("根据ID获取用户角色信息-Service", logs.Desc(userRole))
 	return
 }
 
@@ -358,8 +386,8 @@ func (this *Login) GetUserRoleInfo(userId int) (userRole *entity.UserRoleEntity)
 **/
 func (this *Login) AddUser(user *params.AddUserParam) int {
 	tUserDao := &dao.TUserDao{C: this.C} // 实例化Dao
-	id := tUserDao.AddUser(user)         // 调用Dao方法
-    this.C.Debug("新增用户-Service", logs.Desc(id))
+	id := tUserDao.AddUser(user)
+	this.C.Debug("新增用户-Service", logs.Desc(id))
 	return id
 }
 
@@ -368,8 +396,8 @@ func (this *Login) AddUser(user *params.AddUserParam) int {
 **/
 func (this *Login) UpdateUser(id int, username string) {
 	tUserDao := &dao.TUserDao{C: this.C} // 实例化Dao
-	tUserDao.UpdateUser(id, username)    // 调用Dao方法
-    this.C.Debug("更新用户-Service")
+	tUserDao.UpdateUser(id, username)
+	this.C.Debug("更新用户-Service")
 }
 
 /**
@@ -377,9 +405,10 @@ func (this *Login) UpdateUser(id int, username string) {
 **/
 func (this *Login) DeleteUser(id int) {
 	tUserDao := &dao.TUserDao{C: this.C} // 实例化Dao
-	tUserDao.DeleteUser(id)              // 调用Dao方法
+	tUserDao.DeleteUser(id)
 	this.C.Debug("删除用户-Service")
 }
+
 ```
 
 ---
@@ -629,7 +658,7 @@ func GetUserExternal(c *context.Context) {
 	userExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 用户ID
 	validated.CheckParams(userExternalParam)                       // 检查入参
 	// 返回信息
-	validated.SuccResFeign(c, &UserExternalRtn{
+	c.SuccResFeign(&UserExternalRtn{
 		UserType: "A",
 		UserSex:  "男",
 	})
@@ -643,7 +672,7 @@ func PostUserExternal(c *context.Context) {
 	userExternalParam := new(UserExternalParam)
 	validated.BindAndCheck(c, userExternalParam)
 	// 返回信息
-	validated.SuccResFeign(c, &UserExternalRtn{
+	c.SuccResFeign(&UserExternalRtn{
 		UserType: "B",
 		UserSex:  "女",
 	})
@@ -658,7 +687,7 @@ func PutUserExternal(c *context.Context) {
 	userExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 用户ID
 	validated.CheckParams(userExternalParam)                       // 检查入参
 	// 返回信息
-	validated.SuccResFeign(c, &UserExternalRtn{
+	c.SuccResFeign(&UserExternalRtn{
 		UserType: "C",
 		UserSex:  "男",
 	})
@@ -673,7 +702,7 @@ func DeleteUserExternal(c *context.Context) {
 	userExternalParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id")) // 用户ID
 	validated.CheckParams(userExternalParam)                       // 检查入参
 	// 返回信息
-	validated.SuccResFeign(c, &UserExternalRtn{
+	c.SuccResFeign(&UserExternalRtn{
 		UserType: "D",
 		UserSex:  "女",
 	})
@@ -701,11 +730,11 @@ type UserExternalRtn struct {
 ##### routers
 ```go
 import (
-	"com.jptaker/go-framework-provider/controller"
-	"com.jptaker/go-framework-provider/external/goFramework"
-	"github.com/MassAdobe/go-gin/errs"
+	"github.com/MassAdobe/go-gin-example/controller"
 	"github.com/MassAdobe/go-gin/filter"
+	"github.com/MassAdobe/go-gin/goContext"
 	"github.com/MassAdobe/go-gin/nacos"
+	"github.com/MassAdobe/go-gin/routers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -713,22 +742,22 @@ import (
  * @Description: 配置路由组
 **/
 func Routers() (rtr *gin.Engine) {
-    rtr = context.NewRouter()
-    // 登录
-    login := rtr.Group(nacos.RequestPath("login")).Use(filter.SetTraceAndStep())
-    {
-        login.POST("/signIn", context.Handle(controller.SignIn))                       // 登录
-        login.GET("/getUser", context.Handle(controller.GetUser))                      // 获取用户信息
-        login.GET("/getUserExternal", context.Handle(controller.GetUserExternal))      // 获取用户额外信息
-        login.POST("/postUserExternal", context.Handle(controller.PostUserExternal))   // 获取用户额外信息
-        login.PUT("/putUserExternal", context.Handle(controller.PutUserExternal))      // 获取用户额外信息
-        login.DELETE("/deleteUserExternal", context.Handle(controller.DeleteExternal)) // 获取用户额外信息
-        login.GET("/getUserInfo", context.Handle(controller.GetUserInfo))              // 根据ID获取用户信息
-        login.GET("/getUserRoleInfo", context.Handle(controller.GetUserRoleInfo))      // 根据ID获取用户角色信息
-        login.POST("/addUser", context.Handle(controller.AddUser))                     // 新增用户
-        login.PUT("/updateUser", context.Handle(controller.UpdateUser))                // 更新用户
-        login.DELETE("/deleteUser", context.Handle(controller.DeleteUser))             // 删除用户
-    }
-    return
+	rtr = routers.NewRouter()
+	// 登录
+	login := rtr.Group(nacos.RequestPath("login")).Use(filter.SetTraceAndStep())
+	{
+		login.POST("/signIn", goContext.Handle(controller.SignIn))                       // 登录
+		login.GET("/getUser", goContext.Handle(controller.GetUser))                      // 获取用户信息
+		login.GET("/getUserExternal", goContext.Handle(controller.GetUserExternal))      // 获取用户额外信息
+		login.POST("/postUserExternal", goContext.Handle(controller.PostUserExternal))   // 获取用户额外信息
+		login.PUT("/putUserExternal", goContext.Handle(controller.PutUserExternal))      // 获取用户额外信息
+		login.DELETE("/deleteUserExternal", goContext.Handle(controller.DeleteExternal)) // 获取用户额外信息
+		login.GET("/getUserInfo", goContext.Handle(controller.GetUserInfo))              // 根据ID获取用户信息
+		login.GET("/getUserRoleInfo", goContext.Handle(controller.GetUserRoleInfo))      // 根据ID获取用户角色信息
+		login.POST("/addUser", goContext.Handle(controller.AddUser))                     // 新增用户
+		login.PUT("/updateUser", goContext.Handle(controller.UpdateUser))                // 更新用户
+		login.DELETE("/deleteUser", goContext.Handle(controller.DeleteUser))             // 删除用户
+	}
+	return
 }
 ```

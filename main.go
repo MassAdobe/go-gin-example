@@ -31,10 +31,10 @@ func main() {
 		WriteTimeout:   30 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	logs.Lg.Info("启动", logs.Desc(fmt.Sprintf("启动端口: %d", nacos.InitConfiguration.Serve.Port)))
+	logs.Lg.SysInfo("启动", logs.Desc(fmt.Sprintf("启动端口: %d", nacos.InitConfiguration.Serve.Port)))
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed { // 监听并启动服务
-			logs.Lg.Error("启动失败", err)
+			logs.Lg.SysError("启动失败", err)
 			os.Exit(1)
 		}
 	}()

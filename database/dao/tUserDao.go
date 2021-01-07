@@ -37,10 +37,10 @@ type TUserDao struct {
 func (this *TUserDao) GetUserInfo(userId int) (user *entity.TUser) {
 	user = new(entity.TUser)
 	if find := db.Read.Table(this.Table.TableName()).Where("deleted = ? and id = ?", constants.NOT_DELETED, userId).Find(&user); find.Error != nil && find.Error != gorm.ErrRecordNotFound {
-		logs.Lg.Error("根据ID获取用户信息", find.Error, this.C)
+		this.C.Error("根据ID获取用户信息", find.Error)
 		panic(errs.NewError(wrong.ErrFindUserInfoCode))
 	}
-	logs.Lg.Debug("根据ID获取用户信息-Dao", logs.Desc(user), this.C)
+	this.C.Debug("根据ID获取用户信息-Dao", logs.Desc(user))
 	return
 }
 
@@ -54,10 +54,10 @@ func (this *TUserDao) AddUser(user *params.AddUserParam) int {
 	systemUtils.CopyProperty(userCreate, user)
 	userCreate.CreatedBy, userCreate.CreatedTm, userCreate.UpdatedBy, userCreate.UpdatedTm = 0, time.Now(), 0, time.Now()
 	if create := db.Write.Table(this.Table.TableName()).Create(&userCreate); create.RowsAffected == 0 || create.Error != nil {
-		logs.Lg.Error("新增用户", create.Error, this.C)
+		this.C.Error("新增用户", create.Error)
 		panic(errs.NewError(wrong.ErrAddUserCode))
 	}
-	logs.Lg.Debug("新增用户-Dao", logs.Desc(userCreate), this.C)
+	this.C.Debug("新增用户-Dao", logs.Desc(userCreate))
 	return userCreate.ID
 }
 
@@ -69,10 +69,10 @@ func (this *TUserDao) AddUser(user *params.AddUserParam) int {
 func (this *TUserDao) UpdateUser(id int, username string) {
 	user := &entity.TUser{UserName: username, UpdatedBy: 1, UpdatedTm: time.Now()}
 	if update := db.Write.Table(this.Table.TableName()).Where("id = ?", id).Update(&user); update.Error != nil {
-		logs.Lg.Error("更新用户", update.Error, this.C)
+		this.C.Error("更新用户", update.Error)
 		panic(errs.NewError(wrong.ErrAddUserCode))
 	}
-	logs.Lg.Debug("更新用户-Dao", this.C)
+	this.C.Debug("更新用户-Dao")
 }
 
 /**
@@ -83,8 +83,8 @@ func (this *TUserDao) UpdateUser(id int, username string) {
 func (this *TUserDao) DeleteUser(id int) {
 	user := &entity.TUser{Deleted: constants.NOT_DELETED, UpdatedBy: 1, UpdatedTm: time.Now()}
 	if update := db.Write.Table(this.Table.TableName()).Where("id = ?", id).Update(&user); update.Error != nil {
-		logs.Lg.Error("删除用户", update.Error, this.C)
+		this.C.Error("删除用户", update.Error)
 		panic(errs.NewError(wrong.ErrAddUserCode))
 	}
-	logs.Lg.Debug("删除用户-Dao", this.C)
+	this.C.Debug("删除用户-Dao")
 }

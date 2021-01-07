@@ -10,6 +10,7 @@ import (
 	"github.com/MassAdobe/go-gin/filter"
 	"github.com/MassAdobe/go-gin/goContext"
 	"github.com/MassAdobe/go-gin/nacos"
+	"github.com/MassAdobe/go-gin/routers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,7 +20,7 @@ import (
  * @Description: 配置路由组
 **/
 func Routers() (rtr *gin.Engine) {
-	rtr = goContext.NewRouter()
+	rtr = routers.NewRouter()
 	// 登录
 	login := rtr.Group(nacos.RequestPath("login")).Use(filter.SetTraceAndStep())
 	{
