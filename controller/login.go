@@ -214,3 +214,17 @@ func DeleteUser(c *goContext.Context) {
 	loginService.DeleteUser(id)
 	c.SuccRes(nil)
 }
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/7 3:09 下午
+ * @Description: 测试幂等接口
+**/
+func TestIdempotent(c *goContext.Context) {
+	testIdempotentParam := new(params.TestIdempotentParam)
+	validated.BindAndCheck(c, testIdempotentParam)
+	c.SuccRes(&params.TestIdempotentParamRtn{
+		String: testIdempotentParam.TestString,
+		Int:    testIdempotentParam.TestInt,
+	})
+}

@@ -35,6 +35,8 @@ func Routers() (rtr *gin.Engine) {
 		login.POST("/addUser", goContext.Handle(controller.AddUser))                     // 新增用户
 		login.PUT("/updateUser", goContext.Handle(controller.UpdateUser))                // 更新用户
 		login.DELETE("/deleteUser", goContext.Handle(controller.DeleteUser))             // 删除用户
+		login.POST("/testIdempotent", filter.GetReqUser(), filter.ValidIdempotent(),
+			goContext.Handle(controller.TestIdempotent)) // 测试幂等接口
 	}
 	return
 }

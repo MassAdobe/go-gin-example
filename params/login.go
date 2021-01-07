@@ -183,8 +183,28 @@ type GetUserRoleInfoRtn struct {
  * @Description: 新增用户入参
 **/
 type AddUserParam struct {
-	RealName string `json:"real_name" validate:"required" comment:"真是姓名"`
+	RealName string `json:"real_name" validate:"required" comment:"真实姓名"`
 	UserName string `json:"user_name" validate:"required" comment:"用户名"`
 	PassWord string `json:"pass_word" validate:"required" comment:"密码"`
 	Salt     string `json:"salt" validate:"required" comment:"盐值"`
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/7 3:14 下午
+ * @Description: 测试幂等接口入参
+**/
+type TestIdempotentParam struct {
+	TestString string `json:"test_string" validate:"required" comment:"测试字符串"`
+	TestInt    int    `json:"test_int" validate:"required" comment:"测试数值"`
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/7 3:14 下午
+ * @Description: 测试幂等接口出参
+**/
+type TestIdempotentParamRtn struct {
+	String string `json:"string"`
+	Int    int    `json:"int"`
 }
