@@ -35,6 +35,7 @@ func main() {
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed { // 监听并启动服务
 			logs.Lg.SysError("启动失败", err)
+			start.ShutdownServices() // 关闭相关服务
 			os.Exit(1)
 		}
 	}()

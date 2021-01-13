@@ -53,7 +53,7 @@ func SignIn(c *goContext.Context) {
 	c.Info("登录", logs.Desc("abc"))
 	c.Error("登录", errors.New("login error"))
 	// panic(errs.NewError(wrong.ErrLoginCode))
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 40)
 	// 返回信息
 	c.SuccRes(&params.SignInRtn{
 		UserName:        signInParam.UserName,
