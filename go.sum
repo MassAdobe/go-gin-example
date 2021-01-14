@@ -1,7 +1,7 @@
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/MassAdobe/go-gin v1.3.4 h1:tvs1XxZ4U59k6akrvKGCfGxbhheJa0FzuRHBc5uYuX0=
-github.com/MassAdobe/go-gin v1.3.4/go.mod h1:KPOBjqwzbpHUGhATxFMacb8l7wz+uH0p8nSxsyIW64s=
+github.com/MassAdobe/go-gin v1.3.5 h1:JPjU8vCvbD59wB6vZ/TEEHfWxkk5Lv/BZv7tiz/bYmM=
+github.com/MassAdobe/go-gin v1.3.5/go.mod h1:KPOBjqwzbpHUGhATxFMacb8l7wz+uH0p8nSxsyIW64s=
 github.com/PuerkitoBio/goquery v1.5.1/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=
 github.com/aliyun/alibaba-cloud-sdk-go v1.61.18 h1:zOVTBdCKFd9JbCKz9/nt+FovbjPFmb7mUnp8nH9fQBA=
 github.com/aliyun/alibaba-cloud-sdk-go v1.61.18/go.mod h1:v8ESoHo4SyHmuB4b1tJqDHxfTGEciD+yhvOU/5s1Rfk=
