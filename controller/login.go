@@ -11,13 +11,13 @@ import (
 	"github.com/MassAdobe/go-gin-example/params"
 	"github.com/MassAdobe/go-gin-example/service"
 	"github.com/MassAdobe/go-gin/goContext"
+	"github.com/MassAdobe/go-gin/jwt"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/MassAdobe/go-gin/systemUtils"
 	"github.com/MassAdobe/go-gin/validated"
 	"net/url"
 	"strconv"
-	"time"
 )
 
 /**
@@ -52,8 +52,9 @@ func SignIn(c *goContext.Context) {
 	c.Debug("登录")
 	c.Info("登录", logs.Desc("abc"))
 	c.Error("登录", errors.New("login error"))
+	token := jwt.CreateToken(1, "wechat")
 	// panic(errs.NewError(wrong.ErrLoginCode))
-	time.Sleep(time.Second * 40)
+	//time.Sleep(time.Second * 40)
 	// 返回信息
 	c.SuccRes(&params.SignInRtn{
 		UserName:        signInParam.UserName,
@@ -62,6 +63,7 @@ func SignIn(c *goContext.Context) {
 		NacosTestInt:    testNacos.NacosTestInt,
 		NacosTestBool:   testNacos.NacosTestStruct.NacosTestBool,
 		NacosTestString: testNacos.NacosTestStruct.NacosTestString,
+		Token:           token,
 	})
 }
 
@@ -77,11 +79,14 @@ func GetUser(c *goContext.Context) {
 	getUserParam.UserId, _ = strconv.Atoi(c.GinContext.Query("user_id"))          // 获取参数
 	getUserParam.UserName, _ = url.QueryUnescape(c.GinContext.Query("user_name")) // 获取参数
 	validated.CheckParams(getUserParam)                                           // 检查入参
+	user := c.GetRequestUser()
 	c.SuccRes(&params.GetUserRtn{
-		UserId:   getUserParam.UserId,
-		UserName: getUserParam.UserName,
-		PageNum:  getUserParam.PageNum,
-		PageSize: getUserParam.PageSize,
+		UserId:         getUserParam.UserId,
+		UserName:       getUserParam.UserName,
+		PageNum:        getUserParam.PageNum,
+		PageSize:       getUserParam.PageSize,
+		HeaderUserId:   user.UserId,
+		HeaderUserFrom: user.UserFrom,
 	})
 }
 

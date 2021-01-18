@@ -25,7 +25,7 @@ func Routers() (rtr *gin.Engine) {
 	login := rtr.Group(nacos.RequestPath("login")).Use(filter.SetTraceAndStep())
 	{
 		login.POST("/signIn", goContext.Handle(controller.SignIn))                       // 登录
-		login.GET("/getUser", goContext.Handle(controller.GetUser))                      // 获取用户信息
+		login.GET("/getUser", filter.GetReqUser(), goContext.Handle(controller.GetUser)) // 获取用户信息
 		login.GET("/getUserExternal", goContext.Handle(controller.GetUserExternal))      // 获取用户额外信息
 		login.POST("/postUserExternal", goContext.Handle(controller.PostUserExternal))   // 获取用户额外信息
 		login.PUT("/putUserExternal", goContext.Handle(controller.PutUserExternal))      // 获取用户额外信息

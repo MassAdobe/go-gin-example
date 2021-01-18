@@ -38,6 +38,7 @@ type SignInRtn struct {
 	NacosTestInt    int    `json:"nacos_test_int"`
 	NacosTestString string `json:"nacos_test_string"`
 	NacosTestBool   bool   `json:"nacos_test_bool"`
+	Token           string `json:"token"`
 }
 
 /**
@@ -58,12 +59,14 @@ type GetUserParam struct {
  * @Description: GetUser出参
 **/
 type GetUserRtn struct {
-	PageNum  int    `json:"page_num"`
-	PageSize int    `json:"page_size"`
-	UserId   int    `json:"user_id"`
-	UserName string `json:"user_name"`
-	UserType string `json:"user_type"`
-	UserSex  string `json:"user_sex"`
+	PageNum        int    `json:"page_num"`
+	PageSize       int    `json:"page_size"`
+	UserId         int    `json:"user_id"`
+	UserName       string `json:"user_name"`
+	UserType       string `json:"user_type"`
+	UserSex        string `json:"user_sex"`
+	HeaderUserId   int64  `json:"header_user_id"`
+	HeaderUserFrom string `json:"header_user_from"`
 }
 
 /**
