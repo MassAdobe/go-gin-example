@@ -35,6 +35,6 @@ func RtnTimestampMs() int64 {
  * @Description: 返回日期字符串
 **/
 func RtnDtString() (timsStr string) {
-	timsStr = time.Now().Format(systemUtils.TimeFormatMonth)
+	timsStr = time.Now().Format(systemUtils.TIME_FORMAT_MONTH)
 	return
 }
